@@ -9,6 +9,7 @@ Test script for the pytnt project
 
 import unittest
 
+import numpy as np
 from numpy.testing import assert_allclose
 
 from processTNT import TNTfile
@@ -41,8 +42,9 @@ class TestFourierTransform(unittest.TestCase):
         freq_domain = TNTfile("testdata/LiCl_ref1-ftp.tnt")
         
         lb = freq_domain.TMG2['linebrd'][0, 0]
+        ph0 = freq_domain.TMG2['cumm_0_phase'][0, 0]
         
-        my_ft = time_domain.LBfft(lb, 1)
+        my_ft = time_domain.LBfft(lb, 1, phase=np.deg2rad(ph0))
         
         assert_allclose(freq_domain.DATA, my_ft)
 
