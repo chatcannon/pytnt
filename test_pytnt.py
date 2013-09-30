@@ -9,7 +9,10 @@ Test script for the pytnt project
 
 import unittest
 
+from numpy.testing import assert_allclose
+
 from processTNT import TNTfile
+
 
 class TestLoadFile(unittest.TestCase):
     
@@ -24,7 +27,25 @@ class TestLoadFile(unittest.TestCase):
     def test_load_fails(self):
         with self.assertRaises(AssertionError):
             zero = TNTfile("/dev/zero")
+
+
+class TestFourierTransform(unittest.TestCase):
+    
+    """Test that the Fourier Transform is done correctly
+    
+    Makes sure that the reference frequency is taken into account properly
+    """
+    
+    def test_ref1(self):
+        time_domain = TNTfile("testdata/LiCl_ref1.tnt")
+        freq_domain = TNTfile("testdata/LiCl_ref1-ftp.tnt")
         
+        lb = freq_domain.TMG2['linebrd'][0, 0]
+        
+        my_ft = time_domain.LBfft(lb, 1)
+        
+        assert_allclose(freq_domain.DATA, my_ft)
+
 
 if __name__ == '__main__':
     unittest.main()
