@@ -44,9 +44,11 @@ class TestFourierTransform(unittest.TestCase):
         lb = freq_domain.TMG2['linebrd'][0, 0]
         ph0 = freq_domain.TMG2['cumm_0_phase'][0, 0]
         
-        my_ft = time_domain.LBfft(lb, 1, phase=np.deg2rad(ph0))
+        my_ft = time_domain.LBfft(lb * 3, 1, phase=np.deg2rad(ph0)) / 128
         
-        assert_allclose(freq_domain.DATA, my_ft)
+        # Define the absolute tolerance relative to the noise level
+        tolerance = np.median(abs(freq_domain.DATA)) / 2
+        assert_allclose(my_ft, freq_domain.DATA, atol=tolerance, rtol=1e-5)
 
 
 if __name__ == '__main__':
