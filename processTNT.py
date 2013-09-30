@@ -9,7 +9,7 @@ import TNTdtypes
 
 
 def s(a):
-    if type(a) == np.ndarray:
+    if isinstance(a, np.ndarray):
         a = a.squeeze()
         if a.shape == ():
             a = a[()]
@@ -86,31 +86,25 @@ class TNTfile:
 
     def LBfft(self, LB, zf, phase=None, logfile=None):
         LBdw = -LB * s(self.TMAG['dwell'])[0]
-        DATAlb = np.zeros(shape=self.DATA.shape, dtype='c16', order='F')
         npts = self.DATA.shape[0]
         npts_ft = npts * (2 ** zf)
 
-        ## not sure what this mean adjustment does but it stops a bogus peak
-        ## from appearing in the spectrum
-        DCoffset = np.mean(self.DATA[int(npts * 0.75):, :], axis=0)
-        #DCoffset = (2.0 * mean.real + 1.5j * mean.imag)
+        DCoffset = np.mean(self.DATA[int(npts * 0.75):, :], axis=0, keepdims=True)
         if logfile is not None:
             logfile.write("average DC offset is {0}\n".format(np.mean(DCoffset)))
-        for i in range(npts):
-            DATAlb[i] = (self.DATA[i] - DCoffset) * np.exp(i * LBdw)
+        
+        lbweight = np.exp(LBdw * np.arange(npts, dtype=float))
+        DATAlb = (self.DATA - DCoffset) * lbweight[:, np.newaxis, np.newaxis, np.newaxis]
 
         DATAfft = npfast.fft(DATAlb, n=npts_ft, axis=0)
         DATAfft = fftshift(DATAfft, axes=[0])
 
-        ##phase
         if phase is None: # Phase automatically
             DATAfft = DATAfft * np.exp(-1j * np.angle(np.sum(DATAfft)))
         else:
             DATAfft = DATAfft * np.exp(1j * phase)
 
-        # NB pre-fft'd data stored in TNMR files is high-to-low
-        #    therefore return flipped data to match this
-        return np.flipud(DATAfft)
+        return DATAfft
 
     def freq_Hz(self, altDATA=None):
         if altDATA is None:
@@ -119,13 +113,9 @@ class TNTfile:
             npts = altDATA.shape[0]
         dw = s(self.TMAG['dwell'])[0]
         ref_freq = s(self.TMAG['ref_freq'])
-        # NB: apparently data stored in FT'd TNMR files is high-ppm to low-ppm
-        #     therefore return the reverse of what fftshift tells us
         # TODO: find out whether we should add or subtract ref_freq
         #    All my files have a value that is too small to tell the difference
-        freq = fftshift(fftfreq(npts, dw)) + ref_freq
-        #freq = freq.reshape(1,npts)  # reshape to fit with DATA array
-        return np.flipud(freq)
+        return fftshift(fftfreq(npts, dw)) + ref_freq
 
     def freq_ppm(self, altDATA=None):
         NMR_freq = s(self.TMAG['ob_freq'])[0]
