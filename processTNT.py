@@ -76,8 +76,15 @@ class TNTfile:
 #            tlv = np.asarray(self.tnt_sections[tag].items(), dtype=TNTdtypes.TLV)
 #
 
+    def __getattr__(self, name):
+        """Expose members of the TMAG and TMG2 structures as attributes"""
+        if name in self.TMAG.dtype.names:
+            return self.TMAG[name]
+        if name in self.TMG2.dtype.names:
+            return self.TMG2[name]
+
     def LBfft(self, LB, zf, phase=None, logfile=None):
-        LBdw = -LB * self.TMAG['dwell'][0]
+        LBdw = -LB * self.dwell[0]
         npts = self.DATA.shape[0]
         npts_ft = npts * (2 ** zf)
 
@@ -100,25 +107,25 @@ class TNTfile:
 
     def freq_Hz(self, altDATA=None):
         if altDATA is None:
-            npts = self.TMAG['actual_npts'][0]
+            npts = self.actual_npts[0]
         else:
             npts = altDATA.shape[0]
-        dw = self.TMAG['dwell'][0]
-        ref_freq = self.TMAG['ref_freq']
+        dw = self.dwell[0]
+        ref_freq = self.ref_freq
         # TODO: find out whether we should add or subtract ref_freq
         #    All my files have a value that is too small to tell the difference
         return fftshift(fftfreq(npts, dw)) + ref_freq
 
     def freq_ppm(self, altDATA=None):
-        NMR_freq = self.TMAG['ob_freq'][0]
+        NMR_freq = self.ob_freq[0]
         return self.freq_Hz(altDATA) / NMR_freq
         
     def fid_times(self, altDATA=None):
         if altDATA is None:
-            npts = self.TMAG['actual_npts'][0]
+            npts = self.actual_npts[0]
         else:
             npts = altDATA.shape[0]
-        dw = self.TMAG['dwell'][0]
+        dw = self.dwell[0]
         
         return np.arange(npts) * dw
 
@@ -145,19 +152,19 @@ class TNTfile:
         return (i_min_ppm - 1, i_max_ppm - 1)
 
     def spec_acq_time(self):
-        return self.TMAG['scans'] * (self.TMAG['acq_time'] +
-                                     self.TMAG['last_delay'])
+        return self.scans * (self.acq_time + self.last_delay)
 
     def spec_times(self, nspec=None):
         if nspec is None:
-            nspec = np.prod(self.TMAG['actual_npts'][1:])
+            nspec = np.prod(self.actual_npts[1:])
         return np.arange(nspec) * self.spec_acq_time()
 
     def n_complete_spec(self):
-        if self.TMAG['scans'] == self.TMAG['actual_scans']:
-            num_spectra = self.TMAG['actual_npts'][1]
+        assert (self.actual_npts[2:] == 1).all() # TODO handle general case
+        if self.scans == self.actual_scans:
+            num_spectra = self.actual_npts[1]
         else:  # The last scan was not finished, so omit it
-            num_spectra = self.TMAG['actual_npts'][1] - 1
+            num_spectra = self.actual_npts[1] - 1
         return num_spectra
 
     def save_gnuplot_matrix(self, mat_file, max_ppm=float("+Inf"),

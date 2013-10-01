@@ -41,8 +41,8 @@ class TestFourierTransform(unittest.TestCase):
         time_domain = TNTfile("testdata/LiCl_ref1.tnt")
         freq_domain = TNTfile("testdata/LiCl_ref1-ftp.tnt")
         
-        lb = freq_domain.TMG2['linebrd'][0]
-        ph0 = freq_domain.TMG2['cumm_0_phase'][0]
+        lb = freq_domain.linebrd[0]
+        ph0 = freq_domain.cumm_0_phase[0]
         
         my_ft = time_domain.LBfft(lb * 3, 1, phase=np.deg2rad(ph0)) / 128
         
