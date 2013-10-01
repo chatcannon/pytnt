@@ -83,7 +83,7 @@ class TNTfile:
         if name in self.TMG2.dtype.names:
             return self.TMG2[name]
 
-    def LBfft(self, LB, zf, phase=None, logfile=None):
+    def LBfft(self, LB, zf, phase=None, logfile=None, ph1=0):
         LBdw = -LB * self.dwell[0]
         npts = self.DATA.shape[0]
         npts_ft = npts * (2 ** zf)
@@ -99,9 +99,10 @@ class TNTfile:
         DATAfft = fftshift(DATAfft, axes=[0])
 
         if phase is None: # Phase automatically
-            DATAfft = DATAfft * np.exp(-1j * np.angle(np.sum(DATAfft)))
+            DATAfft *= np.exp(-1j * np.angle(np.sum(DATAfft)))
         else:
-            DATAfft = DATAfft * np.exp(1j * phase)
+            DATAfft *= np.exp(1j * (phase + ph1 * np.linspace(-0.5, 0.5, npts_ft))
+                              )[:, np.newaxis, np.newaxis, np.newaxis]
 
         return DATAfft
 
