@@ -1,6 +1,8 @@
 #!/usr/bin/python
 
 import io
+from collections import OrderedDict
+
 import numpy as np
 from numpy.fft import fftfreq, fftshift
 import numpy.dual as npfast
@@ -21,14 +23,9 @@ def s(a):
 
 class TNTfile:
 
-    tnt_sections = dict()
-    tnt_sections_order = []
-    TMAG = None
-    DATA = None
-    TMG2 = None
-    tntmagic = None
-
     def __init__(self, tntfilename):
+        
+        self.tnt_sections = OrderedDict()
 
         tntfile = open(tntfilename, 'rb')
 
@@ -50,7 +47,6 @@ class TNTfile:
                 assert(len(hdrdict['data']) == data_length)
             else:
                 tntfile.seek(data_length, io.SEEK_CUR)
-            self.tnt_sections_order.append(s(tntTLV['tag']))
             self.tnt_sections[s(tntTLV['tag'])] = hdrdict
             tnthdrbytes = tntfile.read(TNTdtypes.TLV.itemsize)
 
