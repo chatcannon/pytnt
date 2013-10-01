@@ -10,11 +10,12 @@ import numpy.dual as npfast
 import TNTdtypes
 
 
-def s(a):
-    if isinstance(a, (bytes, np.bytes_)):
-        if not isinstance(a, str):  # Python 3
-            a = a.decode('latin1')
-    return a
+def s(b):
+    """Convert a bytes object to a str, decoding with latin1 if necessary"""
+    if isinstance(b, str):  # Python 2
+        return b
+    else:  # Python 3
+        return b.decode('latin1')
 
 
 class TNTfile:
