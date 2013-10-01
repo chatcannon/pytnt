@@ -11,10 +11,6 @@ import TNTdtypes
 
 
 def s(a):
-    if isinstance(a, np.ndarray):
-        a = a.squeeze()
-        if a.shape == ():
-            a = a[()]
     if isinstance(a, (bytes, np.bytes_)):
         if not isinstance(a, str):  # Python 3
             a = a.decode('latin1')
@@ -30,18 +26,18 @@ class TNTfile:
         tntfile = open(tntfilename, 'rb')
 
         self.tntmagic = np.fromstring(tntfile.read(TNTdtypes.Magic.itemsize),
-                                 TNTdtypes.Magic)
+                                 TNTdtypes.Magic, count=1)[0]
 
         assert(TNTdtypes.Magic_re.match(s(self.tntmagic)))
 
         ##Read in the section headers
         tnthdrbytes = tntfile.read(TNTdtypes.TLV.itemsize)
         while(TNTdtypes.TLV.itemsize == len(tnthdrbytes)):
-            tntTLV = np.fromstring(tnthdrbytes, TNTdtypes.TLV)
-            data_length = s(tntTLV['length'])
+            tntTLV = np.fromstring(tnthdrbytes, TNTdtypes.TLV)[0]
+            data_length = tntTLV['length']
             hdrdict = {'offset': tntfile.tell(),
                        'length': data_length,
-                       'bool': bool(s(tntTLV['bool']))}
+                       'bool': bool(tntTLV['bool'])}
             if data_length <= 4096:
                 hdrdict['data'] = tntfile.read(data_length)
                 assert(len(hdrdict['data']) == data_length)
@@ -54,7 +50,7 @@ class TNTfile:
 
         assert(self.tnt_sections['TMAG']['length'] == TNTdtypes.TMAG.itemsize)
         self.TMAG = np.fromstring(self.tnt_sections['TMAG']['data'],
-                                  TNTdtypes.TMAG)
+                                  TNTdtypes.TMAG, count=1)[0]
 
         assert(self.tnt_sections['DATA']['length'] ==
                self.TMAG['actual_npts'].prod() * 8)
@@ -66,12 +62,12 @@ class TNTfile:
                               offset=self.tnt_sections['DATA']['offset'],
                               shape=self.TMAG['actual_npts'].prod())
         self.DATA = np.reshape(self.DATA,
-                               s(self.TMAG['actual_npts']),
+                               self.TMAG['actual_npts'],
                                order='F')
 
         assert(self.tnt_sections['TMG2']['length'] == TNTdtypes.TMG2.itemsize)
         self.TMG2 = np.fromstring(self.tnt_sections['TMG2']['data'],
-                                  TNTdtypes.TMG2)
+                                  TNTdtypes.TMG2, count=1)[0]
 
 #    def writefile(self, outfilename):
 #        outfile = open(outfilename, 'wb')
@@ -81,7 +77,7 @@ class TNTfile:
 #
 
     def LBfft(self, LB, zf, phase=None, logfile=None):
-        LBdw = -LB * s(self.TMAG['dwell'])[0]
+        LBdw = -LB * self.TMAG['dwell'][0]
         npts = self.DATA.shape[0]
         npts_ft = npts * (2 ** zf)
 
@@ -104,25 +100,25 @@ class TNTfile:
 
     def freq_Hz(self, altDATA=None):
         if altDATA is None:
-            npts = s(self.TMAG['actual_npts'])[0]
+            npts = self.TMAG['actual_npts'][0]
         else:
             npts = altDATA.shape[0]
-        dw = s(self.TMAG['dwell'])[0]
-        ref_freq = s(self.TMAG['ref_freq'])
+        dw = self.TMAG['dwell'][0]
+        ref_freq = self.TMAG['ref_freq']
         # TODO: find out whether we should add or subtract ref_freq
         #    All my files have a value that is too small to tell the difference
         return fftshift(fftfreq(npts, dw)) + ref_freq
 
     def freq_ppm(self, altDATA=None):
-        NMR_freq = s(self.TMAG['ob_freq'])[0]
+        NMR_freq = self.TMAG['ob_freq'][0]
         return self.freq_Hz(altDATA) / NMR_freq
         
     def fid_times(self, altDATA=None):
         if altDATA is None:
-            npts = s(self.TMAG['actual_npts'])[0]
+            npts = self.TMAG['actual_npts'][0]
         else:
             npts = altDATA.shape[0]
-        dw = s(self.TMAG['dwell'])[0]
+        dw = self.TMAG['dwell'][0]
         
         return np.arange(npts) * dw
 
@@ -149,19 +145,19 @@ class TNTfile:
         return (i_min_ppm - 1, i_max_ppm - 1)
 
     def spec_acq_time(self):
-        return s(self.TMAG['scans']) * (s(self.TMAG['acq_time']) +
-                                        s(self.TMAG['last_delay']))
+        return self.TMAG['scans'] * (self.TMAG['acq_time'] +
+                                     self.TMAG['last_delay'])
 
     def spec_times(self, nspec=None):
         if nspec is None:
-            nspec = s(self.TMAG['actual_npts'])[1]
+            nspec = np.prod(self.TMAG['actual_npts'][1:])
         return np.arange(nspec) * self.spec_acq_time()
 
     def n_complete_spec(self):
-        if s(self.TMAG['scans']) == s(self.TMAG['actual_scans']):
-            num_spectra = s(self.TMAG['actual_npts'])[1]
+        if self.TMAG['scans'] == self.TMAG['actual_scans']:
+            num_spectra = self.TMAG['actual_npts'][1]
         else:  # The last scan was not finished, so omit it
-            num_spectra = s(self.TMAG['actual_npts'])[1] - 1
+            num_spectra = self.TMAG['actual_npts'][1] - 1
         return num_spectra
 
     def save_gnuplot_matrix(self, mat_file, max_ppm=float("+Inf"),
@@ -216,4 +212,4 @@ class TNTfile:
         for fieldname in TNTdtypes.TMG2.names:
             if fieldname in ['Boolean_space', 'unused', 'space']:
                 continue
-            txtfile.write("{0}:\t{1}\n".format(fieldname, self.TMG2[fieldname]))
+            txtfile.write("{0}:\t{1}\n".format(fieldname, s(self.TMG2[fieldname])))
