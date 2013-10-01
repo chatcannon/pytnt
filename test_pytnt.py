@@ -26,7 +26,7 @@ class TestLoadFile(unittest.TestCase):
         ref1 = TNTfile("testdata/LiCl_ref1-ftp.tnt")
         
     def test_load_fails(self):
-        with self.assertRaises(AssertionError):
+        with self.assertRaises(ValueError):
             zero = TNTfile("/dev/zero")
 
 

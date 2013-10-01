@@ -21,33 +21,32 @@ def s(b):
 class TNTfile:
 
     def __init__(self, tntfilename):
-        
+
         self.tnt_sections = OrderedDict()
 
-        tntfile = open(tntfilename, 'rb')
+        with open(tntfilename, 'rb') as tntfile:
 
-        self.tntmagic = np.fromstring(tntfile.read(TNTdtypes.Magic.itemsize),
-                                 TNTdtypes.Magic, count=1)[0]
+            self.tntmagic = np.fromstring(tntfile.read(TNTdtypes.Magic.itemsize),
+                                          TNTdtypes.Magic, count=1)[0]
 
-        assert(TNTdtypes.Magic_re.match(s(self.tntmagic)))
+            if not TNTdtypes.Magic_re.match(self.tntmagic):
+                raise ValueError("Invalid magic number (is '%s' really a TNMR file?): %s" % (tntfilename, self.tntmagic))
 
-        ##Read in the section headers
-        tnthdrbytes = tntfile.read(TNTdtypes.TLV.itemsize)
-        while(TNTdtypes.TLV.itemsize == len(tnthdrbytes)):
-            tntTLV = np.fromstring(tnthdrbytes, TNTdtypes.TLV)[0]
-            data_length = tntTLV['length']
-            hdrdict = {'offset': tntfile.tell(),
-                       'length': data_length,
-                       'bool': bool(tntTLV['bool'])}
-            if data_length <= 4096:
-                hdrdict['data'] = tntfile.read(data_length)
-                assert(len(hdrdict['data']) == data_length)
-            else:
-                tntfile.seek(data_length, io.SEEK_CUR)
-            self.tnt_sections[s(tntTLV['tag'])] = hdrdict
+            ##Read in the section headers
             tnthdrbytes = tntfile.read(TNTdtypes.TLV.itemsize)
-
-        tntfile.close()
+            while(TNTdtypes.TLV.itemsize == len(tnthdrbytes)):
+                tntTLV = np.fromstring(tnthdrbytes, TNTdtypes.TLV)[0]
+                data_length = tntTLV['length']
+                hdrdict = {'offset': tntfile.tell(),
+                           'length': data_length,
+                           'bool': bool(tntTLV['bool'])}
+                if data_length <= 4096:
+                    hdrdict['data'] = tntfile.read(data_length)
+                    assert(len(hdrdict['data']) == data_length)
+                else:
+                    tntfile.seek(data_length, io.SEEK_CUR)
+                self.tnt_sections[s(tntTLV['tag'])] = hdrdict
+                tnthdrbytes = tntfile.read(TNTdtypes.TLV.itemsize)
 
         assert(self.tnt_sections['TMAG']['length'] == TNTdtypes.TMAG.itemsize)
         self.TMAG = np.fromstring(self.tnt_sections['TMAG']['data'],

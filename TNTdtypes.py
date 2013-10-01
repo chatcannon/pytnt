@@ -9,11 +9,11 @@ objects. The definitions are based on the documentation in the file
 "A1 - TNMR File Format.doc" distributed with the TNMR software.
 """
 
+import re
+
 from numpy import dtype
 
-from re import compile
-
-Magic_re = compile(r"^TNT1\.\d\d\d$")
+Magic_re = re.compile(b"^TNT1\.\d\d\d$")
 
 Magic = dtype('a8')
 TLV = dtype([('tag','a4'),('bool','<u4'),('length','<u4')])
