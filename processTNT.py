@@ -113,9 +113,8 @@ class TNTfile:
             npts = altDATA.shape[0]
         dw = self.dwell[0]
         ref_freq = self.ref_freq
-        # TODO: find out whether we should add or subtract ref_freq
-        #    All my files have a value that is too small to tell the difference
-        return fftshift(fftfreq(npts, dw)) + ref_freq
+        
+        return -(fftshift(fftfreq(npts, dw)) + ref_freq)
 
     def freq_ppm(self, altDATA=None):
         NMR_freq = self.ob_freq[0]
