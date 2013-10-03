@@ -83,14 +83,20 @@ class TNTfile:
         if name in self.TMG2.dtype.names:
             return self.TMG2[name]
 
-    def LBfft(self, LB, zf, phase=None, logfile=None, ph1=0):
+    def LBfft(self, LB, zf, phase=None, logfile=None, ph1=0, DCoffset=None):
         LBdw = -LB * self.dwell[0] * np.pi  # Multiply by pi to match TNMR
         npts = self.DATA.shape[0]
         npts_ft = npts * (2 ** zf)
 
-        DCoffset = np.mean(self.DATA[int(npts * 0.75):, :], axis=0, keepdims=True)
-        if logfile is not None:
-            logfile.write("average DC offset is {0}\n".format(np.mean(DCoffset)))
+        if DCoffset is None:
+            # Taking the last eighth of the points seems to give OK (but not
+            # perfect) agreement with the TNMR DC offset correction.
+            # This hasn't been tested with enough different values of npts
+            # to be sure that this is the right formula.
+            DCoffset = np.mean(self.DATA[int(npts / -8):, :, :, :], 
+                               axis=0, keepdims=True)
+            if logfile is not None:
+                logfile.write("average DC offset is %g\n" % np.mean(DCoffset))
         
         lbweight = np.exp(LBdw * np.arange(npts, dtype=float))
         DATAlb = (self.DATA - DCoffset) * lbweight[:, np.newaxis, np.newaxis, np.newaxis]

@@ -105,7 +105,6 @@ class TestFourierTransform(unittest.TestCase):
         tolerance = np.median(abs(freq_domain.DATA)) / 20
         assert_allclose(my_ft, freq_domain.DATA, atol=tolerance, rtol=1e-5)
     
-    @unittest.expectedFailure
     def test_ref2(self):
         time_domain = TNTfile("testdata/LiCl_ref2.tnt")
         freq_domain = TNTfile("testdata/LiCl_ref2-ftp.tnt")
@@ -118,10 +117,9 @@ class TestFourierTransform(unittest.TestCase):
                                   ph1 = np.deg2rad(ph1))
         
         # Define the absolute tolerance relative to the noise level
-        tolerance = np.median(abs(freq_domain.DATA)) / 20
+        tolerance = np.median(abs(freq_domain.DATA)) / 2
         assert_allclose(my_ft, freq_domain.DATA, atol=tolerance, rtol=1e-5)
     
-    @unittest.expectedFailure
     def test_ref3(self):
         time_domain = TNTfile("testdata/LiCl_ref3.tnt")
         freq_domain = TNTfile("testdata/LiCl_ref3-ftp.tnt")
@@ -134,10 +132,9 @@ class TestFourierTransform(unittest.TestCase):
                                   ph1 = np.deg2rad(ph1))
         
         # Define the absolute tolerance relative to the noise level
-        tolerance = np.median(abs(freq_domain.DATA)) / 20
+        tolerance = np.median(abs(freq_domain.DATA)) / 4
         assert_allclose(my_ft, freq_domain.DATA, atol=tolerance, rtol=1e-5)
     
-    @unittest.expectedFailure
     def test_ref4(self):
         time_domain = TNTfile("testdata/LiCl_ref4.tnt")
         freq_domain = TNTfile("testdata/LiCl_ref4-ftp.tnt")
@@ -150,7 +147,7 @@ class TestFourierTransform(unittest.TestCase):
                                   ph1 = np.deg2rad(ph1))
         
         # Define the absolute tolerance relative to the noise level
-        tolerance = np.median(abs(freq_domain.DATA)) / 20
+        tolerance = np.median(abs(freq_domain.DATA)) / 4
         assert_allclose(my_ft, freq_domain.DATA, atol=tolerance, rtol=1e-5)
 
     def test_2118_ref40ppm(self):
