@@ -98,7 +98,7 @@ class TestFourierTransform(unittest.TestCase):
         ph0 = freq_domain.cumm_0_phase[0]
         ph1 = freq_domain.cumm_1_phase[0]
         
-        my_ft = time_domain.LBfft(lb * np.pi, 1, phase=np.deg2rad(ph0),
+        my_ft = time_domain.LBfft(lb, 1, phase=np.deg2rad(ph0),
                                   ph1 = np.deg2rad(ph1))
         
         # Define the absolute tolerance relative to the noise level
@@ -114,7 +114,7 @@ class TestFourierTransform(unittest.TestCase):
         ph0 = freq_domain.cumm_0_phase[0]
         ph1 = freq_domain.cumm_1_phase[0]
         
-        my_ft = time_domain.LBfft(lb * np.pi, 1, phase=np.deg2rad(ph0),
+        my_ft = time_domain.LBfft(lb, 1, phase=np.deg2rad(ph0),
                                   ph1 = np.deg2rad(ph1))
         
         # Define the absolute tolerance relative to the noise level
@@ -130,7 +130,7 @@ class TestFourierTransform(unittest.TestCase):
         ph0 = freq_domain.cumm_0_phase[0]
         ph1 = freq_domain.cumm_1_phase[0]
         
-        my_ft = time_domain.LBfft(lb * np.pi, 1, phase=np.deg2rad(ph0),
+        my_ft = time_domain.LBfft(lb, 1, phase=np.deg2rad(ph0),
                                   ph1 = np.deg2rad(ph1))
         
         # Define the absolute tolerance relative to the noise level
@@ -146,7 +146,7 @@ class TestFourierTransform(unittest.TestCase):
         ph0 = freq_domain.cumm_0_phase[0]
         ph1 = freq_domain.cumm_1_phase[0]
         
-        my_ft = time_domain.LBfft(lb * np.pi, 1, phase=np.deg2rad(ph0),
+        my_ft = time_domain.LBfft(lb, 1, phase=np.deg2rad(ph0),
                                   ph1 = np.deg2rad(ph1))
         
         # Define the absolute tolerance relative to the noise level
@@ -161,7 +161,7 @@ class TestFourierTransform(unittest.TestCase):
         ph0 = freq_domain.cumm_0_phase[0]
         ph1 = freq_domain.cumm_1_phase[0]
         
-        my_ft = time_domain.LBfft(lb * np.pi, 3, phase=np.deg2rad(ph0),
+        my_ft = time_domain.LBfft(lb, 3, phase=np.deg2rad(ph0),
                                   ph1 = np.deg2rad(ph1))
         
         # Define the absolute tolerance relative to the noise level

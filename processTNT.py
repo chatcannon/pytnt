@@ -84,7 +84,7 @@ class TNTfile:
             return self.TMG2[name]
 
     def LBfft(self, LB, zf, phase=None, logfile=None, ph1=0):
-        LBdw = -LB * self.dwell[0]
+        LBdw = -LB * self.dwell[0] * np.pi  # Multiply by pi to match TNMR
         npts = self.DATA.shape[0]
         npts_ft = npts * (2 ** zf)
 
