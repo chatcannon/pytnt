@@ -97,6 +97,7 @@ class TNTfile:
 
         DATAfft = npfast.fft(DATAlb, n=npts_ft, axis=0)
         DATAfft = fftshift(DATAfft, axes=[0])
+        DATAfft /= np.sqrt(npts_ft) # To match TNMR behaviour
 
         if phase is None: # Phase automatically
             DATAfft *= np.exp(-1j * np.angle(np.sum(DATAfft)))
