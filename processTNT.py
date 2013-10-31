@@ -93,19 +93,19 @@ class TNTfile:
             # perfect) agreement with the TNMR DC offset correction.
             # This hasn't been tested with enough different values of npts
             # to be sure that this is the right formula.
-            DCoffset = np.mean(self.DATA[int(npts / -8):, :, :, :], 
+            DCoffset = np.mean(self.DATA[int(npts / -8):, :, :, :],
                                axis=0, keepdims=True)
             if logfile is not None:
                 logfile.write("average DC offset is %g\n" % np.mean(DCoffset))
-        
+
         lbweight = np.exp(LBdw * np.arange(npts, dtype=float))
         DATAlb = (self.DATA - DCoffset) * lbweight[:, np.newaxis, np.newaxis, np.newaxis]
 
         DATAfft = npfast.fft(DATAlb, n=npts_ft, axis=0)
         DATAfft = fftshift(DATAfft, axes=[0])
-        DATAfft /= np.sqrt(npts_ft) # To match TNMR behaviour
+        DATAfft /= np.sqrt(npts_ft)  # To match TNMR behaviour
 
-        if phase is None: # Phase automatically
+        if phase is None:  # Phase automatically
             DATAfft *= np.exp(-1j * np.angle(np.sum(DATAfft)))
         else:
             DATAfft *= np.exp(1j * (phase + ph1 * np.linspace(-0.5, 0.5, npts_ft))
@@ -120,20 +120,20 @@ class TNTfile:
             npts = altDATA.shape[0]
         dw = self.dwell[0]
         ref_freq = self.ref_freq
-        
+
         return -(fftshift(fftfreq(npts, dw)) + ref_freq)
 
     def freq_ppm(self, altDATA=None):
         NMR_freq = self.ob_freq[0]
         return self.freq_Hz(altDATA) / NMR_freq
-        
+
     def fid_times(self, altDATA=None):
         if altDATA is None:
             npts = self.actual_npts[0]
         else:
             npts = altDATA.shape[0]
         dw = self.dwell[0]
-        
+
         return np.arange(npts) * dw
 
     def ppm_points(self, max_ppm, min_ppm, altDATA=None):
@@ -167,7 +167,7 @@ class TNTfile:
         return np.arange(nspec) * self.spec_acq_time()
 
     def n_complete_spec(self):
-        assert (self.actual_npts[2:] == 1).all() # TODO handle general case
+        assert (self.actual_npts[2:] == 1).all()  # TODO handle general case
         if self.scans == self.actual_scans:
             num_spectra = self.actual_npts[1]
         else:  # The last scan was not finished, so omit it
@@ -175,7 +175,7 @@ class TNTfile:
         return num_spectra
 
     def save_gnuplot_matrix(self, mat_file, max_ppm=float("+Inf"),
-                            min_ppm=float("-Inf"), altDATA=None, 
+                            min_ppm=float("-Inf"), altDATA=None,
                             times=None, logfile=None):
         ppm = self.freq_ppm(altDATA)
         (i_max_ppm, i_min_ppm) = self.ppm_points(max_ppm, min_ppm, altDATA)
@@ -195,13 +195,14 @@ class TNTfile:
 
         gpt_matrix[0, 0] = npts
         gpt_matrix[1:, 0] = ppm
-        
+
         if times is None:
             times = self.spec_times(nspec)
 
         for i in range(nspec):
             gpt_matrix[0, i+1] = times[i]
-            ## without the 'squeeze', we get some kind of 'output operand requires a reduction, but reduction is not enabled' error ??
+            ## without the 'squeeze', we get some kind of 'output operand
+            ## requires a reduction, but reduction is not enabled' error ??
             gpt_matrix[1:, i+1] = DATAslice.real[:, i].squeeze()
             if logfile is not None:
                 logfile.write('.')
@@ -210,7 +211,7 @@ class TNTfile:
             logfile.write('Done\n')
             logfile.flush()
 
-        del(gpt_matrix) # flush the file to disk
+        del(gpt_matrix)  # flush the file to disk
 
     def dump_params_txt(self, txtfile):
         if type(txtfile) == str:
