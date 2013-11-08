@@ -108,9 +108,9 @@ class TNTfile:
 
         DATAfft = npfast.fft(DATAlb, n=npts_ft, axis=0)
         DATAfft = fftshift(DATAfft, axes=[0])
-        DATAfft /= np.sqrt(npts_ft) # To match TNMR behaviour
+        DATAfft /= np.sqrt(npts_ft)  # To match TNMR behaviour
 
-        if phase is None: # Phase automatically
+        if phase is None:  # Phase automatically
             DATAfft *= np.exp(-1j * np.angle(np.sum(DATAfft)))
         else:
             DATAfft *= np.exp(1j * (phase + ph1 * np.linspace(-0.5, 0.5, npts_ft))
@@ -172,7 +172,7 @@ class TNTfile:
         return np.arange(nspec) * self.spec_acq_time()
 
     def n_complete_spec(self):
-        assert (self.actual_npts[2:] == 1).all() # TODO handle general case
+        assert (self.actual_npts[2:] == 1).all()  # TODO handle general case
         if self.scans == self.actual_scans:
             num_spectra = self.actual_npts[1]
         else:  # The last scan was not finished, so omit it
@@ -206,7 +206,8 @@ class TNTfile:
 
         for i in range(nspec):
             gpt_matrix[0, i+1] = times[i]
-            ## without the 'squeeze', we get some kind of 'output operand requires a reduction, but reduction is not enabled' error ??
+            ## without the 'squeeze', we get some kind of 'output operand
+            ## requires a reduction, but reduction is not enabled' error ??
             gpt_matrix[1:, i+1] = DATAslice.real[:, i].squeeze()
             if logfile is not None:
                 logfile.write('.')
@@ -215,7 +216,7 @@ class TNTfile:
             logfile.write('Done\n')
             logfile.flush()
 
-        del(gpt_matrix) # flush the file to disk
+        del(gpt_matrix)  # flush the file to disk
 
     def dump_params_txt(self, txtfile):
         if type(txtfile) == str:
