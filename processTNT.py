@@ -83,9 +83,14 @@ class TNTfile:
         if name in self.TMG2.dtype.names:
             return self.TMG2[name]
 
-    def LBfft(self, LB, zf, phase=None, logfile=None, ph1=0, DCoffset=None):
+    def LBfft(self, LB=0, zf=0, phase=None, logfile=None, ph1=0,
+              DCoffset=None, altDATA=None):
+        if altDATA is None:
+            DATA = self.DATA
+        else:
+            DATA = altDATA
         LBdw = -LB * self.dwell[0] * np.pi  # Multiply by pi to match TNMR
-        npts = self.DATA.shape[0]
+        npts = DATA.shape[0]
         npts_ft = npts * (2 ** zf)
 
         if DCoffset is None:
@@ -93,13 +98,13 @@ class TNTfile:
             # perfect) agreement with the TNMR DC offset correction.
             # This hasn't been tested with enough different values of npts
             # to be sure that this is the right formula.
-            DCoffset = np.mean(self.DATA[int(npts / -8):, :, :, :], 
+            DCoffset = np.mean(DATA[int(npts / -8):, :, :, :],
                                axis=0, keepdims=True)
             if logfile is not None:
                 logfile.write("average DC offset is %g\n" % np.mean(DCoffset))
-        
+
         lbweight = np.exp(LBdw * np.arange(npts, dtype=float))
-        DATAlb = (self.DATA - DCoffset) * lbweight[:, np.newaxis, np.newaxis, np.newaxis]
+        DATAlb = (DATA - DCoffset) * lbweight[:, np.newaxis, np.newaxis, np.newaxis]
 
         DATAfft = npfast.fft(DATAlb, n=npts_ft, axis=0)
         DATAfft = fftshift(DATAfft, axes=[0])
@@ -120,20 +125,20 @@ class TNTfile:
             npts = altDATA.shape[0]
         dw = self.dwell[0]
         ref_freq = self.ref_freq
-        
+
         return -(fftshift(fftfreq(npts, dw)) + ref_freq)
 
     def freq_ppm(self, altDATA=None):
         NMR_freq = self.ob_freq[0]
         return self.freq_Hz(altDATA) / NMR_freq
-        
+
     def fid_times(self, altDATA=None):
         if altDATA is None:
             npts = self.actual_npts[0]
         else:
             npts = altDATA.shape[0]
         dw = self.dwell[0]
-        
+
         return np.arange(npts) * dw
 
     def ppm_points(self, max_ppm, min_ppm, altDATA=None):
@@ -175,7 +180,7 @@ class TNTfile:
         return num_spectra
 
     def save_gnuplot_matrix(self, mat_file, max_ppm=float("+Inf"),
-                            min_ppm=float("-Inf"), altDATA=None, 
+                            min_ppm=float("-Inf"), altDATA=None,
                             times=None, logfile=None):
         ppm = self.freq_ppm(altDATA)
         (i_max_ppm, i_min_ppm) = self.ppm_points(max_ppm, min_ppm, altDATA)
@@ -195,7 +200,7 @@ class TNTfile:
 
         gpt_matrix[0, 0] = npts
         gpt_matrix[1:, 0] = ppm
-        
+
         if times is None:
             times = self.spec_times(nspec)
 
