@@ -7,7 +7,7 @@ import numpy as np
 from numpy.fft import fftfreq, fftshift
 import numpy.dual as npfast
 
-import TNTdtypes
+from . import TNTdtypes
 
 
 def s(b):
