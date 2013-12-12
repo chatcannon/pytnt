@@ -1,7 +1,10 @@
 #!/usr/bin/python
 
+import sys
 import io
 from collections import OrderedDict
+import datetime
+from time import gmtime
 
 import numpy as np
 from numpy.fft import fftfreq, fftshift
@@ -76,12 +79,42 @@ class TNTfile:
 #            tlv = np.asarray(self.tnt_sections[tag].items(), dtype=TNTdtypes.TLV)
 #
 
+    @property
+    def start_time(self):
+        """The time when the NMR acquisition was started
+
+        No timezone information is available"""
+        time_struct = gmtime(self.TMAG['start_time'])
+        return datetime.datetime(*time_struct[:6])
+
+    @property
+    def finish_time(self):
+        """The time when the NMR acquisition ended
+
+        No timezone information is available"""
+        time_struct = gmtime(self.TMAG['finish_time'])
+        return datetime.datetime(*time_struct[:6])
+
+    @property
+    def date(self):
+        """The time when the file was saved
+
+        No timezone information is available"""
+        strlen = self.TMAG['date'].index(b'\x00')
+        if sys.version_info.major <= 2:
+            datestr = str(self.TMAG['date'][:strlen])
+        else:
+            datestr = str(self.TMAG['date'][:strlen], encoding='ascii')
+        return datetime.datetime.strptime(datestr, "%Y/%m/%d %H:%M:%S")
+
     def __getattr__(self, name):
         """Expose members of the TMAG and TMG2 structures as attributes"""
         if name in self.TMAG.dtype.names:
             return self.TMAG[name]
-        if name in self.TMG2.dtype.names:
+        elif name in self.TMG2.dtype.names:
             return self.TMG2[name]
+        else:
+            raise AttributeError("'%s' is not a member of the TMAG or TMG2 structs" % name)
 
     def LBfft(self, LB=0, zf=0, phase=None, logfile=None, ph1=0,
               DCoffset=None, altDATA=None):
