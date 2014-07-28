@@ -21,6 +21,13 @@ def s(b):
         return b.decode('latin1')
 
 
+def unsqueeze(M, new_ndim=4):
+    """Add extra dimensions to a matrix so it has the desired dimensionality"""
+    newshape = np.ones((new_ndim,))
+    newshape[:M.ndim] = M.shape
+    return np.reshape(M, newshape, order='A')
+
+
 class TNTfile:
 
     def __init__(self, tntfilename):
