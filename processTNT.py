@@ -17,8 +17,10 @@ def s(b):
     """Convert a bytes object to a str, decoding with latin1 if necessary"""
     if isinstance(b, str):  # Python 2
         return b
-    else:  # Python 3
+    elif isinstance(b, bytes):  # Python 3
         return b.decode('latin1')
+    else:
+        return b
 
 
 def unsqueeze(M, new_ndim=4):
