@@ -188,7 +188,8 @@ class TNTfile:
 
     def ppm_points(self, max_ppm, min_ppm, altDATA=None):
         """Given a maximum and minimum frequency (in ppm), return the indices
-        of the points in the spectrum that correspond to that range"""
+        of the points in the spectrum that correspond to the beginning and
+        one-past-the-end of that range."""
         ppm = self.freq_ppm(altDATA)
         npts = len(ppm)
 
@@ -197,18 +198,13 @@ class TNTfile:
         i_min_ppm = npts
 
         # N.B. the ppm array goes from high to low
-        for i in range(npts):
-            if ppm[i] <= max_ppm:
-                i_max_ppm = i
-                break
-        for i in range(i_max_ppm, npts):
-            if ppm[i] < min_ppm:
-                i_min_ppm = i
-                break
+        i_max_ppm = npts - np.searchsorted(ppm[::-1], max_ppm, side='right')
+        i_min_ppm = npts - np.searchsorted(ppm[::-1], min_ppm, side='left')
         return (i_max_ppm, i_min_ppm)
 
     def ppm_points_reverse(self, min_ppm, max_ppm, altDATA=None):
         (i_max_ppm, i_min_ppm) = self.ppm_points(max_ppm, min_ppm, altDATA)
+        # Does not work if i_max_ppm is 0, because the it returns -1
         return (i_min_ppm - 1, i_max_ppm - 1)
 
     def spec_acq_time(self):
