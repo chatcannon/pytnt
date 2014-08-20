@@ -95,6 +95,32 @@ class TestRefFreq(unittest.TestCase):
 
         assert_array_almost_equal(tnt.freq_Hz(), hz, decimal=3)
 
+    def test_ppm_points(self):
+        tnt = TNTfile("testdata/7LiCl_2118_ref40ppmS.tnt")
+
+        max_ppm = 50
+        min_ppm = -35.2
+        ppm = tnt.freq_ppm()
+        imax, imin = tnt.ppm_points(max_ppm, min_ppm)
+        self.assertLess(imax, imin)
+        assert np.all(ppm[:imax] > max_ppm)
+        assert np.all(ppm[imax:] <= max_ppm)
+        assert np.all(ppm[:imin] >= min_ppm)
+        assert np.all(ppm[imin:] < min_ppm)
+
+    def test_ppm_points_reverse(self):
+        tnt = TNTfile("testdata/7LiCl_ref0ppmS.tnt")
+
+        max_ppm = 5
+        min_ppm = -35.2
+        reverse_ppm = tnt.freq_ppm()
+        imin, imax = tnt.ppm_points_reverse(min_ppm, max_ppm)
+        self.assertGreater(imin, imax)
+        assert np.all(reverse_ppm[:imin:-1] < min_ppm)
+        assert np.all(reverse_ppm[imin::-1] >= min_ppm)
+        assert np.all(reverse_ppm[:imax:-1] <= max_ppm)
+        assert np.all(reverse_ppm[imax::-1] > max_ppm)
+
 
 class TestFourierTransform(unittest.TestCase):
 

@@ -17,8 +17,17 @@ def s(b):
     """Convert a bytes object to a str, decoding with latin1 if necessary"""
     if isinstance(b, str):  # Python 2
         return b
-    else:  # Python 3
+    elif isinstance(b, bytes):  # Python 3
         return b.decode('latin1')
+    else:
+        return b
+
+
+def unsqueeze(M, new_ndim=4):
+    """Add extra dimensions to a matrix so it has the desired dimensionality"""
+    newshape = np.ones((new_ndim,))
+    newshape[:M.ndim] = M.shape
+    return np.reshape(M, newshape, order='A')
 
 
 def convert_si(si_num_list):
@@ -225,6 +234,7 @@ class TNTfile:
         return DATAfft
 
     def freq_Hz(self, altDATA=None):
+        """Returns the frequency axis (in Hz) for the NMR spectrum"""
         if altDATA is None:
             npts = self.actual_npts[0]
         else:
@@ -235,10 +245,12 @@ class TNTfile:
         return -(fftshift(fftfreq(npts, dw)) + ref_freq)
 
     def freq_ppm(self, altDATA=None):
+        """Returns the frequency axis (in ppm) for the NMR spectrum"""
         NMR_freq = self.ob_freq[0]
         return self.freq_Hz(altDATA) / NMR_freq
 
     def fid_times(self, altDATA=None):
+        """Returns the time axis (in s) for the FID"""
         if altDATA is None:
             npts = self.actual_npts[0]
         else:
@@ -248,36 +260,45 @@ class TNTfile:
         return np.arange(npts) * dw
 
     def ppm_points(self, max_ppm, min_ppm, altDATA=None):
+        """Given a maximum and minimum frequency (in ppm), return the indices
+        of the points in the spectrum that correspond to the beginning and
+        one-past-the-end of that range."""
         ppm = self.freq_ppm(altDATA)
         npts = len(ppm)
 
-        ## Account for the situation in which max or min are out of range
+        # Account for the situation in which max or min are out of range
         i_max_ppm = 0
         i_min_ppm = npts
 
-        for i in range(npts):
-            if ppm[i] <= max_ppm:
-                i_max_ppm = i
-                break
-        for i in range(i_max_ppm, npts):
-            if ppm[i] < min_ppm:
-                i_min_ppm = i
-                break
+        # N.B. the ppm array goes from high to low
+        i_max_ppm = npts - np.searchsorted(ppm[::-1], max_ppm, side='right')
+        i_min_ppm = npts - np.searchsorted(ppm[::-1], min_ppm, side='left')
         return (i_max_ppm, i_min_ppm)
 
     def ppm_points_reverse(self, min_ppm, max_ppm, altDATA=None):
         (i_max_ppm, i_min_ppm) = self.ppm_points(max_ppm, min_ppm, altDATA)
+        # Does not work if i_max_ppm is 0, because the it returns -1
         return (i_min_ppm - 1, i_max_ppm - 1)
 
     def spec_acq_time(self):
+        """Returns the total time taken to acquire one spectrum
+
+        i.e. number of scans * (acquisition time + delay between scans)"""
         return self.scans * (self.acq_time + self.last_delay)
 
     def spec_times(self, nspec=None):
+        """Return the time at which the acquisition of each spectrum began"""
         if nspec is None:
             nspec = np.prod(self.actual_npts[1:])
         return np.arange(nspec) * self.spec_acq_time()
 
     def n_complete_spec(self):
+        """The number of spectra where all the scans have been completed
+
+        Sometimes acquisition is stopped in the middle of acquiring a
+        spectrum. In this case, not all the scans of the last spectrum have
+        been acquired, so the summed intensity will be less. It might be
+        desirable to omit the last spectrum in this case."""
         assert (self.actual_npts[2:] == 1).all()  # TODO handle general case
         if self.scans == self.actual_scans:
             num_spectra = self.actual_npts[1]
@@ -285,9 +306,16 @@ class TNTfile:
             num_spectra = self.actual_npts[1] - 1
         return num_spectra
 
-    def save_gnuplot_matrix(self, mat_file, max_ppm=float("+Inf"),
-                            min_ppm=float("-Inf"), altDATA=None,
-                            times=None, logfile=None):
+    def save_gnuplot_matrix(self, mat_file, max_ppm=np.Inf, min_ppm=-np.Inf,
+                            altDATA=None, times=None, logfile=None):
+        """Save a file suitable for use as a gnuplot 'binary matrix'
+
+        Only the real part is saved, and it is converted to 32 bit float.
+        The frequency goes in the first row, and the acquisition time goes in
+        the first column.
+
+        See http://gnuplot.sourceforge.net/docs_4.2/node330.html for a
+        description of the data format."""
         ppm = self.freq_ppm(altDATA)
         (i_max_ppm, i_min_ppm) = self.ppm_points(max_ppm, min_ppm, altDATA)
 
@@ -325,6 +353,7 @@ class TNTfile:
         del(gpt_matrix)  # flush the file to disk
 
     def dump_params_txt(self, txtfile):
+        """Write a text file with the acquisition and processing parameters"""
         if type(txtfile) == str:
             txtfile = open(txtfile, 'w')
 
