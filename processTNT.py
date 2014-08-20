@@ -5,7 +5,7 @@ import io
 from collections import OrderedDict
 import datetime
 from time import gmtime
-
+import re
 import numpy as np
 from numpy.fft import fftfreq, fftshift
 import numpy.dual as npfast
@@ -19,6 +19,51 @@ def s(b):
         return b
     else:  # Python 3
         return b.decode('latin1')
+
+
+def convert_si(si_num_list):
+    """takes a list of strings, si_num_lst, of the form xxx.xxx<si suffix>
+    and returns an array of floats xxx.xxxe-6 or similar, depending on the si
+    suffix
+    """
+    # A dict of all the SI prefixes
+    prefix = {'y': 1e-24,  # yocto
+              'z': 1e-21,  # zepto
+              'a': 1e-18,  # atto
+              'f': 1e-15,  # femto
+              'p': 1e-12,  # pico
+              'n': 1e-9,   # nano
+              'u': 1e-6,   # micro
+              'm': 1e-3,   # mili
+              'c': 1e-2,   # centi
+              'd': 1e-1,   # deci
+              'k': 1e3,    # kilo
+              'M': 1e6,    # mega
+              'G': 1e9,    # giga
+              'T': 1e12,   # tera
+              'P': 1e15,   # peta
+              'E': 1e18,   # exa
+              'Z': 1e21,   # zetta
+              'Y': 1e24,   # yotta
+              }
+    # go through the items in the list and try to float them. If they don't
+    # float...
+    for index, item in enumerate(si_num_list):
+        try:
+            si_num_list[index] = float(item)
+        except ValueError:
+            # check if the last character is a valid prefix
+            if item[-1] in prefix:
+                # if it is, set that list element to the rest of the item
+                # multiplied by the value appropriate to the prefix
+                si_num_list[index] = prefix[item[-1]] * float(item[:-1])
+            else:
+                # raise if it doesn't work out
+                raise ValueError("Couldn't convert delay table entires\
+                                 to float! Make sure your suffixes\
+                                 correspond to real SI units.")
+    #return it as an array
+    return np.array(si_num_list)
 
 
 class TNTfile:
@@ -50,6 +95,33 @@ class TNTfile:
                     tntfile.seek(data_length, io.SEEK_CUR)
                 self.tnt_sections[s(tntTLV['tag'])] = hdrdict
                 tnthdrbytes = tntfile.read(TNTdtypes.TLV.itemsize)
+            # Find and parse the delay tables
+            self.DELAY = {}
+            # This RegExp should match only bytearrays containing
+            # things like "deXX:X" or so.
+            delay_re = re.compile(b'de[0-9]*:[0-9]')
+            # seek well past the data section so we read as little
+            # of the file into memory as possible
+            tntfile.seek(self.tnt_sections["TMG2"]["offset"])
+            search_region = tntfile.read()
+            # Do the search, and iterate over the matches
+            for match in delay_re.finditer(search_region):
+                # Lets go back and read the section properly. Offset back by
+                # four to capture the delay table name length
+                offset = (self.tnt_sections["TMG2"]["offset"]
+                          + match.start() - 4)
+                tntfile.seek(offset)
+                # extract the name length, the name, the delay length,
+                # and the delay.
+                name_len = np.fromfile(tntfile, dtype=np.int32, count=1)[0]
+                delay_name = s(tntfile.read(name_len))
+                delay_len = np.fromfile(tntfile, dtype=np.int32, count=1)[0]
+                delay = s(tntfile.read(delay_len))
+                # Now check for delay tables of length one and discard them
+                if len(delay) > 1:
+                    delay = delay.split()
+                    delay = convert_si(delay)
+                    self.DELAY[delay_name] = delay
 
         assert(self.tnt_sections['TMAG']['length'] == TNTdtypes.TMAG.itemsize)
         self.TMAG = np.fromstring(self.tnt_sections['TMAG']['data'],
@@ -71,6 +143,7 @@ class TNTfile:
         assert(self.tnt_sections['TMG2']['length'] == TNTdtypes.TMG2.itemsize)
         self.TMG2 = np.fromstring(self.tnt_sections['TMG2']['data'],
                                   TNTdtypes.TMG2, count=1)[0]
+
 
 #    def writefile(self, outfilename):
 #        outfile = open(outfilename, 'wb')
