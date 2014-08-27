@@ -46,6 +46,7 @@ def convert_si(si_num_list):
               'm': 1e-3,   # mili
               'c': 1e-2,   # centi
               'd': 1e-1,   # deci
+              's': 1,      # seconds
               'k': 1e3,    # kilo
               'M': 1e6,    # mega
               'G': 1e9,    # giga
@@ -111,7 +112,7 @@ class TNTfile:
             delay_re = re.compile(b'de[0-9]+:[0-9]')
             # seek well past the data section so we read as little
             # of the file into memory as possible
-            tntfile.seek(self.tnt_sections["TMG2"]["offset"])
+            tntfile.seek(self.tnt_sections["PSEQ"]["offset"])
             search_region = tntfile.read()
             # Do the search, and iterate over the matches
             for match in delay_re.finditer(search_region):
