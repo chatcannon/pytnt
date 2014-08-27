@@ -109,7 +109,7 @@ class TNTfile:
             self.DELAY = {}
             # This RegExp should match only bytearrays containing
             # things like "deXX:X" or so.
-            delay_re = re.compile(b'de[0-9]*:[0-9]')
+            delay_re = re.compile(b'de[0-9]+:[0-9]')
             # seek well past the data section so we read as little
             # of the file into memory as possible
             tntfile.seek(self.tnt_sections["PSEQ"]["offset"])
