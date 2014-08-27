@@ -68,9 +68,9 @@ def convert_si(si_num_list):
                 si_num_list[index] = prefix[item[-1]] * float(item[:-1])
             else:
                 # raise if it doesn't work out
-                raise ValueError("Couldn't convert delay table entires\
-                                 to float! Make sure your suffixes\
-                                 correspond to real SI units.")
+                raise ValueError("""Couldn't convert delay table entry '%s'
+                                 to float! Make sure your suffixes
+                                 correspond to real SI units.""" % item)
     #return it as an array
     return np.array(si_num_list)
 
