@@ -118,7 +118,7 @@ class TNTfile:
             for match in delay_re.finditer(search_region):
                 # Lets go back and read the section properly. Offset back by
                 # four to capture the delay table name length
-                offset = (self.tnt_sections["TMG2"]["offset"]
+                offset = (self.tnt_sections["PSEQ"]["offset"]
                           + match.start() - 4)
                 tntfile.seek(offset)
                 # extract the name length, the name, the delay length,
