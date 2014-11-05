@@ -205,5 +205,12 @@ class TestFourierTransform(unittest.TestCase):
         assert_allclose(my_ft, freq_domain.DATA, atol=tolerance, rtol=1e-5)
 
 
+class TestDelayTables(unittest.TestCase):
+    
+    def test_nut2d(self):
+        nut2d = TNTfile("testdata/nut2d.tnt")
+        assert_allclose(nut2d.DELAY['de7:2'], np.arange(1.0, 9.0))
+
+
 if __name__ == '__main__':
     unittest.main()
