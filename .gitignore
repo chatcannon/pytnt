@@ -37,7 +37,7 @@ nosetests.xml
 
 # .tnt data files for testing
 *.tnt
-testdata/*.txt
+testdata/*
 
 # IPython notebook files for exploratory work to find out why tests fail
 *.ipynb

@@ -33,9 +33,9 @@ class TestLoadFile(unittest.TestCase):
                                   usec, decimal=3)
 
     def test_load_freq_domain(self):
-        ref1 = TNTfile("testdata/LiCl_ref1-ftp.tnt")
+        ref1 = TNTfile("testdata/LiCl_ref1_ftp.tnt")
 
-        real, imag, hz = np.loadtxt("testdata/LiCl_ref1-ftp.txt",
+        real, imag, hz = np.loadtxt("testdata/LiCl_ref1_ftp.txt",
                                     skiprows=3, unpack=True)
 
         assert_array_almost_equal(ref1.DATA.real.squeeze(), real, decimal=3)
@@ -131,7 +131,7 @@ class TestFourierTransform(unittest.TestCase):
 
     def test_ref1(self):
         time_domain = TNTfile("testdata/LiCl_ref1.tnt")
-        freq_domain = TNTfile("testdata/LiCl_ref1-ftp.tnt")
+        freq_domain = TNTfile("testdata/LiCl_ref1_ftp.tnt")
 
         lb = freq_domain.linebrd[0]
         ph0 = freq_domain.cumm_0_phase[0]
@@ -146,7 +146,7 @@ class TestFourierTransform(unittest.TestCase):
 
     def test_ref2(self):
         time_domain = TNTfile("testdata/LiCl_ref2.tnt")
-        freq_domain = TNTfile("testdata/LiCl_ref2-ftp.tnt")
+        freq_domain = TNTfile("testdata/LiCl_ref2_ftp.tnt")
 
         lb = freq_domain.linebrd[0]
         ph0 = freq_domain.cumm_0_phase[0]
@@ -161,7 +161,7 @@ class TestFourierTransform(unittest.TestCase):
 
     def test_ref3(self):
         time_domain = TNTfile("testdata/LiCl_ref3.tnt")
-        freq_domain = TNTfile("testdata/LiCl_ref3-ftp.tnt")
+        freq_domain = TNTfile("testdata/LiCl_ref3_ftp.tnt")
 
         lb = freq_domain.linebrd[0]
         ph0 = freq_domain.cumm_0_phase[0]
@@ -176,7 +176,7 @@ class TestFourierTransform(unittest.TestCase):
 
     def test_ref4(self):
         time_domain = TNTfile("testdata/LiCl_ref4.tnt")
-        freq_domain = TNTfile("testdata/LiCl_ref4-ftp.tnt")
+        freq_domain = TNTfile("testdata/LiCl_ref4_ftp.tnt")
 
         lb = freq_domain.linebrd[0]
         ph0 = freq_domain.cumm_0_phase[0]
