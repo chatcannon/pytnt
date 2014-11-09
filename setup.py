@@ -17,5 +17,5 @@ setup(
         'Natural Language :: English'],
     packages=['pytnt'],
     scripts=['scripts/find_TNMR_backup_files.py'],  # TODO make this use entry_points
-    install_requires='numpy'
+    install_requires=['numpy']
 )
