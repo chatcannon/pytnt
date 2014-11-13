@@ -68,6 +68,16 @@ def convert_si(si_num_list):
     return np.array(si_num_list)
 
 
+def read_pascal_string(data, number_type='<i4', encoding='ascii'):
+    number_type = np.dtype(number_type)
+    length = np.fromstring(data, dtype=number_type, count=1)
+    number_size = number_type.itemsize
+    text = data[number_size:number_size + length]
+    if not isinstance(text, str):
+        text = str(text, encoding)
+    return text
+
+
 def save_gnuplot_matrix(tnt, mat_file, max_ppm=np.Inf, min_ppm=-np.Inf,
                         altDATA=None, times=None, logfile=None):
     """Save a file suitable for use as a gnuplot 'binary matrix'

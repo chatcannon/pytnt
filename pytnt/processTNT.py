@@ -11,7 +11,7 @@ from numpy.fft import fftfreq, fftshift
 import numpy.dual as npfast
 
 from . import TNTdtypes
-from .utils import convert_si, make_str as s
+from .utils import convert_si, read_pascal_string, make_str as s
 
 
 class TNTfile:
@@ -56,15 +56,12 @@ class TNTfile:
             for match in delay_re.finditer(search_region):
                 # Lets go back and read the section properly. Offset back by
                 # four to capture the delay table name length
-                offset = (self.tnt_sections["PSEQ"]["offset"]
-                          + match.start() - 4)
-                tntfile.seek(offset)
+                offset = (match.start() - 4)
                 # extract the name length, the name, the delay length,
                 # and the delay.
-                name_len = np.fromfile(tntfile, dtype=np.int32, count=1)[0]
-                delay_name = s(tntfile.read(name_len))
-                delay_len = np.fromfile(tntfile, dtype=np.int32, count=1)[0]
-                delay = s(tntfile.read(delay_len))
+                delay_name = read_pascal_string(search_region[offset:])
+                offset = match.start() + len(delay_name)
+                delay = read_pascal_string(search_region[offset:])
                 # Now check for delay tables of length one and discard them
                 if len(delay) > 1:
                     delay = delay.split()
