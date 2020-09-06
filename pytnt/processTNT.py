@@ -22,7 +22,7 @@ class TNTfile:
 
         with open(tntfilename, 'rb') as tntfile:
 
-            self.tntmagic = np.fromstring(tntfile.read(TNTdtypes.Magic.itemsize),
+            self.tntmagic = np.frombuffer(tntfile.read(TNTdtypes.Magic.itemsize),
                                           TNTdtypes.Magic, count=1)[0]
 
             if not TNTdtypes.Magic_re.match(self.tntmagic):
@@ -31,7 +31,7 @@ class TNTfile:
             ##Read in the section headers
             tnthdrbytes = tntfile.read(TNTdtypes.TLV.itemsize)
             while(TNTdtypes.TLV.itemsize == len(tnthdrbytes)):
-                tntTLV = np.fromstring(tnthdrbytes, TNTdtypes.TLV)[0]
+                tntTLV = np.frombuffer(tnthdrbytes, TNTdtypes.TLV)[0]
                 data_length = tntTLV['length']
                 hdrdict = {'offset': tntfile.tell(),
                            'length': data_length,
@@ -69,7 +69,7 @@ class TNTfile:
                     self.DELAY[delay_name] = delay
 
         assert(self.tnt_sections['TMAG']['length'] == TNTdtypes.TMAG.itemsize)
-        self.TMAG = np.fromstring(self.tnt_sections['TMAG']['data'],
+        self.TMAG = np.frombuffer(self.tnt_sections['TMAG']['data'],
                                   TNTdtypes.TMAG, count=1)[0]
 
         assert(self.tnt_sections['DATA']['length'] ==
@@ -86,7 +86,7 @@ class TNTfile:
                                order='F')
 
         assert(self.tnt_sections['TMG2']['length'] == TNTdtypes.TMG2.itemsize)
-        self.TMG2 = np.fromstring(self.tnt_sections['TMG2']['data'],
+        self.TMG2 = np.frombuffer(self.tnt_sections['TMG2']['data'],
                                   TNTdtypes.TMG2, count=1)[0]
 
 

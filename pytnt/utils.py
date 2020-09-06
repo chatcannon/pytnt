@@ -70,7 +70,7 @@ def convert_si(si_num_list):
 
 def read_pascal_string(data, number_type='<i4', encoding='ascii'):
     number_type = np.dtype(number_type)
-    length = np.fromstring(data, dtype=number_type, count=1).item()
+    length = np.frombuffer(data, dtype=number_type, count=1).item()
     number_size = number_type.itemsize
     text = data[number_size:number_size + length]
     if not isinstance(text, str):
