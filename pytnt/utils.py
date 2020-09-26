@@ -72,6 +72,10 @@ def read_pascal_string(data, number_type='<i4', encoding='ascii'):
     number_type = np.dtype(number_type)
     length = np.frombuffer(data, dtype=number_type, count=1).item()
     number_size = number_type.itemsize
+    if len(data) < number_size + length:
+        raise IndexError("Pascal string claims to have length %d but only "
+                         "%d bytes of data are available" % (
+                                 length, len(data) - number_size))
     text = data[number_size:number_size + length]
     if not isinstance(text, str):
         text = str(text, encoding)
