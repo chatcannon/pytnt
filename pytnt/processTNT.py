@@ -59,7 +59,11 @@ class TNTfile:
                 offset = (match.start() - 4)
                 # extract the name length, the name, the delay length,
                 # and the delay.
-                delay_name = read_pascal_string(search_region[offset:])
+                try:
+                    delay_name = read_pascal_string(search_region[offset:])
+                except IndexError:
+                    # Not a real delay table - the Pascal string was invalid
+                    continue
                 offset = match.start() + len(delay_name)
                 delay = read_pascal_string(search_region[offset:])
                 # Now check for delay tables of length one and discard them
