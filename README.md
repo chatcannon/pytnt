@@ -2,6 +2,8 @@ pytnt
 =====
 
 <!---
+SPDX-FileCopyrightText: 2013 Christopher Kerr
+
 SPDX-License-Identifier: GPL-3.0-or-later
 -->
 

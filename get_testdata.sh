@@ -1,5 +1,7 @@
 #!/bin/sh
 
+# SPDX-FileCopyrightText: 2014 Christopher Kerr
+#
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 ## Test data are posted on FigShare, listed in this article
