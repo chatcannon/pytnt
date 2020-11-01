@@ -1,5 +1,7 @@
 #!/bin/sh
 
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 ## Test data are posted on FigShare, listed in this article
 # http://figshare.com/articles/pytnt_test_data/1228508
 

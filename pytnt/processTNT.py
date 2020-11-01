@@ -1,5 +1,6 @@
 #!/usr/bin/python
 
+# SPDX-License-Identifier: GPL-3.0-or-later
 import sys
 import io
 from collections import OrderedDict

@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+
+# SPDX-License-Identifier: GPL-3.0-or-later
 """
 Created on Sat Sep  1 10:58:32 2012
 
