@@ -5,12 +5,19 @@
 #
 # SPDX-License-Identifier: GPL-3.0-or-later
 
+import os.path
+
 from setuptools import setup
+
+with open(os.path.join(os.path.dirname(__file__), 'README.md')) as f:
+    readme = f.read()
 
 setup(
     name='pytnt',
     version='0.0.2',
     description="Open and process data files from TecMag's .tnt file format",
+    long_description=readme,
+    long_description_content_type="text/markdown",
     url='https://github.com/chatcannon/pytnt',
     author='Chris Kerr',
     license='GPLv3+',
