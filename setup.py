@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
 # SPDX-FileCopyrightText: 2014 Christopher Kerr
@@ -20,6 +21,10 @@ setup(
         'License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)',
         'Natural Language :: English'],
     packages=['pytnt'],
-    scripts=['scripts/find_TNMR_backup_files.py'],  # TODO make this use entry_points
+    entry_points={
+        'console_scripts': [
+            'find_TNMR_backup_files = pytnt.find_TNMR_backup_files:main',
+        ],
+    },
     install_requires=['numpy']
 )
