@@ -140,10 +140,10 @@ def dump_params_txt(tnt, txtfile):
     for fieldname in TNTdtypes.TMAG.names:
         if fieldname.startswith('space'):
             continue
-        txtfile.write("{0}:\t{1}\n".format(fieldname, s(tnt.TMAG[fieldname])))
+        txtfile.write("{0}:\t{1}\n".format(fieldname, make_str(tnt.TMAG[fieldname])))
 
     txtfile.write("\nTMG2 struct (processing parameters):\n")
     for fieldname in TNTdtypes.TMG2.names:
         if fieldname in ['Boolean_space', 'unused', 'space']:
             continue
-        txtfile.write("{0}:\t{1}\n".format(fieldname, s(tnt.TMG2[fieldname])))
+        txtfile.write("{0}:\t{1}\n".format(fieldname, make_str(tnt.TMG2[fieldname])))

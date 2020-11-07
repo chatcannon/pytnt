@@ -17,7 +17,7 @@ from numpy.fft import fftfreq, fftshift
 import numpy.dual as npfast
 
 from . import TNTdtypes
-from .utils import convert_si, read_pascal_string, make_str as s
+from .utils import convert_si, read_pascal_string, make_str
 
 
 class TNTfile:
@@ -47,7 +47,7 @@ class TNTfile:
                     assert(len(hdrdict['data']) == data_length)
                 else:
                     tntfile.seek(data_length, io.SEEK_CUR)
-                self.tnt_sections[s(tntTLV['tag'])] = hdrdict
+                self.tnt_sections[make_str(tntTLV['tag'])] = hdrdict
                 tnthdrbytes = tntfile.read(TNTdtypes.TLV.itemsize)
             # Find and parse the delay tables
             self.DELAY = {}
