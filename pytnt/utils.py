@@ -3,7 +3,7 @@
 # SPDX-FileCopyrightText: 2014,2020 Christopher Kerr
 # SPDX-FileCopyrightText: 2014 Matthew Lawson
 #
-# SPDX-License-Identifier: GPL-3.0-or-later
+# SPDX-License-Identifier: GPL-3.0-or-later AND BSD-3-Clause
 import numpy as np
 
 from . import TNTdtypes
