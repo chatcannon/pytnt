@@ -1,22 +1,11 @@
-# -*- coding: utf-8 -*-
-
 # SPDX-FileCopyrightText: 2014,2020 Christopher Kerr
 # SPDX-FileCopyrightText: 2014 Matthew Lawson
 #
 # SPDX-License-Identifier: GPL-3.0-or-later AND BSD-3-Clause
+
 import numpy as np
 
 from . import TNTdtypes
-
-
-def make_str(b):
-    """Convert a bytes object to a str, decoding with latin1 if necessary"""
-    if isinstance(b, str):  # Python 2
-        return b
-    elif isinstance(b, bytes):  # Python 3
-        return b.decode('latin1')
-    else:
-        return b
 
 
 def unsqueeze(M, new_ndim=4):
@@ -80,9 +69,8 @@ def read_pascal_string(data, number_type='<i4', encoding='ascii'):
         raise IndexError("Pascal string claims to have length %d but only "
                          "%d bytes of data are available" % (
                                  length, len(data) - number_size))
-    text = data[number_size:number_size + length]
-    if not isinstance(text, str):
-        text = str(text, encoding)
+    btext = data[number_size:number_size + length]
+    text = str(btext, encoding=encoding)
     return text
 
 
@@ -142,10 +130,10 @@ def dump_params_txt(tnt, txtfile):
     for fieldname in TNTdtypes.TMAG.names:
         if fieldname.startswith('space'):
             continue
-        txtfile.write("{0}:\t{1}\n".format(fieldname, s(tnt.TMAG[fieldname])))
+        txtfile.write("{0}:\t{1}\n".format(fieldname, tnt.decode(tnt.TMAG[fieldname])))
 
     txtfile.write("\nTMG2 struct (processing parameters):\n")
     for fieldname in TNTdtypes.TMG2.names:
         if fieldname in ['Boolean_space', 'unused', 'space']:
             continue
-        txtfile.write("{0}:\t{1}\n".format(fieldname, s(tnt.TMG2[fieldname])))
+        txtfile.write("{0}:\t{1}\n".format(fieldname, tnt.decode(tnt.TMG2[fieldname])))

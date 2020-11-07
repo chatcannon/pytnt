@@ -1,9 +1,10 @@
-#!/usr/bin/python
-
 # SPDX-FileCopyrightText: 2014,2020 Christopher Kerr
 # SPDX-FileCopyrightText: 2014 Matthew Lawson
 #
 # SPDX-License-Identifier: GPL-3.0-or-later AND BSD-3-Clause
+
+"""The main TNTfile class for loading data from .tnt files
+"""
 
 import sys
 import io
@@ -16,13 +17,20 @@ from numpy.fft import fftfreq, fftshift
 import numpy.dual as npfast
 
 from . import TNTdtypes
-from .utils import convert_si, read_pascal_string, make_str as s
+from .utils import convert_si, read_pascal_string
 
 
 class TNTfile:
 
-    def __init__(self, tntfilename):
+    def __init__(self, tntfilename, encoding='ascii'):
+        """Open and read a .tnt file.
 
+        Args:
+            tntfilename: Path to the file to read
+            encoding: Encoding to use when reading text data from the file
+        """
+
+        self.encoding = encoding
         self.tnt_sections = OrderedDict()
 
         with open(tntfilename, 'rb') as tntfile:
@@ -46,7 +54,7 @@ class TNTfile:
                     assert(len(hdrdict['data']) == data_length)
                 else:
                     tntfile.seek(data_length, io.SEEK_CUR)
-                self.tnt_sections[s(tntTLV['tag'])] = hdrdict
+                self.tnt_sections[self.decode(tntTLV['tag'])] = hdrdict
                 tnthdrbytes = tntfile.read(TNTdtypes.TLV.itemsize)
             # Find and parse the delay tables
             self.DELAY = {}
@@ -65,12 +73,12 @@ class TNTfile:
                 # extract the name length, the name, the delay length,
                 # and the delay.
                 try:
-                    delay_name = read_pascal_string(search_region[offset:])
+                    delay_name = read_pascal_string(search_region[offset:], encoding=self.encoding)
                 except IndexError:
                     # Not a real delay table - the Pascal string was invalid
                     continue
                 offset = match.start() + len(delay_name)
-                delay = read_pascal_string(search_region[offset:])
+                delay = read_pascal_string(search_region[offset:], encoding=self.encoding)
                 # Now check for delay tables of length one and discard them
                 if len(delay) > 1:
                     delay = delay.split()
@@ -250,3 +258,7 @@ class TNTfile:
         else:  # The last scan was not finished, so omit it
             num_spectra = self.actual_npts[1] - 1
         return num_spectra
+
+    def decode(self, bdata):
+        """Decode a string using this file's encoding."""
+        return str(bdata, encoding=self.encoding)

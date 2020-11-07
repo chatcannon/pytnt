@@ -1,14 +1,9 @@
-# -*- coding: utf-8 -*-
-
 # SPDX-FileCopyrightText: 2014 Christopher Kerr
 #
 # SPDX-License-Identifier: GPL-3.0-or-later
-"""
-Created on Mon Sep 30 20:22:29 2013
+"""Test script for the pytnt project
 
-@author: chris
-
-Test script for the pytnt project
+The tests use the unittest library.
 """
 
 import unittest

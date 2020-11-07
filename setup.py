@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
 
 # SPDX-FileCopyrightText: 2014 Christopher Kerr
 #
@@ -14,7 +13,7 @@ with open(os.path.join(os.path.dirname(__file__), 'README.md')) as f:
 
 setup(
     name='pytnt',
-    version='0.1.0',
+    version='0.2.0-pre',
     description="Read NMR data files in the TecMag .tnt file format",
     long_description=readme,
     long_description_content_type="text/markdown",
@@ -24,8 +23,7 @@ setup(
     license='GPLv3+',
     classifiers=[
         'Development Status :: 3 - Alpha',
-        'Programming Language :: Python :: 2.7',
-        'Programming Language :: Python :: 3',
+        'Programming Language :: Python :: 3 :: Only',
         'Intended Audience :: Developers',
         'Intended Audience :: Science/Research',
         'License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)',
@@ -38,7 +36,7 @@ setup(
             'find_TNMR_backup_files = pytnt.find_TNMR_backup_files:main',
         ],
     },
-    python_requires='>=2.7',
+    python_requires='>=3.6',
     install_requires=['numpy'],
     tests_require=['pytest'],
 )
