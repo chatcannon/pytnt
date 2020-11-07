@@ -79,9 +79,8 @@ def read_pascal_string(data, number_type='<i4', encoding='ascii'):
         raise IndexError("Pascal string claims to have length %d but only "
                          "%d bytes of data are available" % (
                                  length, len(data) - number_size))
-    text = data[number_size:number_size + length]
-    if not isinstance(text, str):
-        text = str(text, encoding)
+    btext = data[number_size:number_size + length]
+    text = str(btext, encoding=encoding)
     return text
 
 
