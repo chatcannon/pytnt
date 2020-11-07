@@ -1,5 +1,9 @@
 # -*- coding: utf-8 -*-
 
+# SPDX-FileCopyrightText: 2014 Christopher Kerr
+#
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 from setuptools import setup
 
 setup(

@@ -1,4 +1,8 @@
 # -*- coding: utf-8 -*-
+
+# SPDX-FileCopyrightText: 2014 Christopher Kerr
+#
+# SPDX-License-Identifier: GPL-3.0-or-later
 """
 Created on Mon Sep 30 20:22:29 2013
 

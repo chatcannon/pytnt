@@ -1,5 +1,9 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
+
+# SPDX-FileCopyrightText: 2013 Christopher Kerr
+#
+# SPDX-License-Identifier: GPL-3.0-or-later
 """
 There is an option in the TNMR control software to save backup files at
 regular intervals during data acquisition, so that in the event of power

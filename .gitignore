@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2013-2014 Christopher Kerr
+#
+# SPDX-License-Identifier: CC0-1.0
+
 *.py[cod]
 
 # C extensions
@@ -34,6 +38,9 @@ nosetests.xml
 .project
 .pydevproject
 
+# Spyder
+.spyderproject
+.spyproject/*
 
 # .tnt data files for testing
 *.tnt
