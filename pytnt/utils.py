@@ -8,16 +8,6 @@ import numpy as np
 from . import TNTdtypes
 
 
-def make_str(b):
-    """Convert a bytes object to a str, decoding with latin1 if necessary"""
-    if isinstance(b, str):  # Python 2
-        return b
-    elif isinstance(b, bytes):  # Python 3
-        return b.decode('latin1')
-    else:
-        return b
-
-
 def unsqueeze(M, new_ndim=4):
     """Add extra dimensions to a matrix so it has the desired dimensionality"""
     newshape = np.ones((new_ndim,))
@@ -140,10 +130,10 @@ def dump_params_txt(tnt, txtfile):
     for fieldname in TNTdtypes.TMAG.names:
         if fieldname.startswith('space'):
             continue
-        txtfile.write("{0}:\t{1}\n".format(fieldname, make_str(tnt.TMAG[fieldname])))
+        txtfile.write("{0}:\t{1}\n".format(fieldname, tnt.decode(tnt.TMAG[fieldname])))
 
     txtfile.write("\nTMG2 struct (processing parameters):\n")
     for fieldname in TNTdtypes.TMG2.names:
         if fieldname in ['Boolean_space', 'unused', 'space']:
             continue
-        txtfile.write("{0}:\t{1}\n".format(fieldname, make_str(tnt.TMG2[fieldname])))
+        txtfile.write("{0}:\t{1}\n".format(fieldname, tnt.decode(tnt.TMG2[fieldname])))
