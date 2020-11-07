@@ -14,7 +14,7 @@ with open(os.path.join(os.path.dirname(__file__), 'README.md')) as f:
 
 setup(
     name='pytnt',
-    version='0.0.2',
+    version='0.1.0',
     description="Open and process data files from TecMag's .tnt file format",
     long_description=readme,
     long_description_content_type="text/markdown",
