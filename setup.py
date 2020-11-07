@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
 # SPDX-FileCopyrightText: 2014 Christopher Kerr
