@@ -1,9 +1,10 @@
-#!/usr/bin/python
-
 # SPDX-FileCopyrightText: 2014,2020 Christopher Kerr
 # SPDX-FileCopyrightText: 2014 Matthew Lawson
 #
 # SPDX-License-Identifier: GPL-3.0-or-later AND BSD-3-Clause
+
+"""The main TNTfile class for loading data from .tnt files
+"""
 
 import sys
 import io

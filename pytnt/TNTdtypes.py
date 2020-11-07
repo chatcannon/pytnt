@@ -1,12 +1,8 @@
-# -*- coding: utf-8 -*-
-
 # SPDX-FileCopyrightText: 2014 Christopher Kerr
 #
 # SPDX-License-Identifier: GPL-3.0-or-later
-"""
-Created on Sat Sep  1 10:58:32 2012
 
-@author: Chris Kerr
+"""numpy dtype definitions for .tnt file structures
 
 This file contains the dtype definitions for reading TNT files into numpy
 objects. The definitions are based on the documentation in the file
